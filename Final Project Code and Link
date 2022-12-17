@@ -1,0 +1,431 @@
+ Link to Project:
+ https://mimicproject.com/code/482bd135-2f77-3e11-f92b-3598a22cfd39
+
+
+<html>
+
+<head>
+ <!-- This is an HTML comment -->
+ <!-- Below we are grabbing three.js and some helper stuff for using the camera -->
+ <script src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/109/three.min.js"></script>
+  <script src = "orbitControls.js"></script>
+   <script src = "https://mimicproject.com/libs/maximilian.js"></script>
+	<meta charset="utf-8">
+	<style>
+		body {
+			margin: 0px;
+			background-color: #000000;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+	<script type="text/javascript">
+     
+      
+      // Initialize mouse
+   var mouseX = 0;
+   var mouseY = 0;
+      
+   var previousMouseX = mouseX;
+   var previousMouseY = mouseY;
+      
+      
+      //Initialize music elements
+   let maxi = maximilian();
+   let audio = new maxi.maxiAudio();
+   let myOsc = new maxi.maxiOsc();
+   let myOsc2 = new maxi.maxiOsc();
+   let myOsc3 = new maxi.maxiOsc();
+   let myOsc4 = new maxi.maxiOsc();
+   
+  
+      //Rock crumbling Audio
+   let rocks = new maxi.maxiSample();   
+   var rocksPitch = 2;
+   var rocksAmplitude = 2; 
+      
+   audio.init();   
+   audio.loadSample('rocks1.wav', rocks);     
+      
+      
+      // Clock initialization
+   let clock = new maxi.maxiClock();
+   var tempo = 120;
+   var ticks = 4;  
+   var startAmplitude = 5;
+   var playHead = 0;
+      
+      // clock tempo
+   clock.setTempo(tempo);
+   clock.setTicksPerBeat(ticks);
+  
+   audio.play = function() {
+   
+   clock.ticker();
+   let addSound = 0;
+   let multiplySound = 1;
+   let randomNumber = Math.random();
+    
+    // 40 second audio using Oscillators and rock crumbling audio
+    
+    if(clock.playHead < 256) {
+		addSound += myOsc.sinewave(myOsc2.sinewave(1/30) * 20) * startAmplitude;
+ };
+    if(clock.playHead < 100) {
+		addSound += myOsc3.sinewave(myOsc4.sinewave(1/100) * 100) * startAmplitude;
+     };
+    if(clock.playHead > 70) {
+          startAmplitude = Math.max(3, startAmplitude - 0.01);
+    };
+    var out = (rocks.play(rocksPitch) * rocksAmplitude)  + addSound * multiplySound;
+      return out;
+  }
+    
+
+
+      // Creates camera and field of view      
+	var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000); 
+
+      // Create scene and add things to it.   
+	var scene = new THREE.Scene();
+ 
+      
+      
+      // Scene Geometry Setup Box (world) and plane (floor)
+	var geometry = new THREE.BoxGeometry(30, 30, 30);
+    var geometry3 = new THREE.PlaneGeometry( 30, 30 );
+ 
+      //sphere (rock) 1  
+    var geometry2 = new THREE.SphereGeometry( 1, 2,10 ); 
+    var geometry4 = new THREE.SphereGeometry( 1, 1,10 ); 
+      //sphere (rock) 2  
+    var geometry9 = new THREE.SphereGeometry( 1, 2,10 ); 
+    var geometry10 = new THREE.SphereGeometry( 1, 1,10 ); 
+      //sphere (rock) 3
+    var geometry12 = new THREE.SphereGeometry( 1, 1,10 ); 
+    var geometry13 = new THREE.SphereGeometry( 1, 2,10 );  
+      //sphere (rock) 4
+    var geometry14 = new THREE.SphereGeometry( 1, 1,10 );  
+    var geometry15 = new THREE.SphereGeometry( 1, 2,10 );
+      //sphere 5 (rock)
+    var geometry16 = new THREE.SphereGeometry( 1, 1,10 ); 
+    var geometry17 = new THREE.SphereGeometry( 1, 2,10 );  
+      
+      
+     
+      // Rotating central rings 
+    var geometry5 = new THREE.RingGeometry( 39, 7, 32 );
+    var geometry6 = new THREE.RingGeometry( 30, 7, 32 );
+    var geometry7 = new THREE.RingGeometry( 30, 7, 32 );  
+    var geometry8 = new THREE.RingGeometry( 30, 7, 32 ); 
+
+       
+      //Initialize textures
+	var myTextureLoader = new THREE.TextureLoader();    
+    var myTextureLoader2 = new THREE.TextureLoader();  
+      
+      //Assign textures 
+	var myTexture = myTextureLoader.load('blue-black-background-graphics.jpg');
+    var myTexture2 = myTextureLoader2.load('angulat.jpg');
+  
+      
+      // Initalize materials which are affected by light (meshLambert) and apply to textures 
+	var material = new THREE.MeshLambertMaterial({map: myTexture,side:THREE.DoubleSide}); 
+    var material2 = new THREE.MeshLambertMaterial({map: myTexture2});   
+    var material3 = new THREE.MeshLambertMaterial({map: myTexture2,side:THREE.DoubleSide});      
+    var material4 = new THREE.MeshLambertMaterial({map: myTexture2}); 
+    var material5 = new THREE.MeshLambertMaterial({map: myTexture}); 
+       
+      
+          
+     // Initialise scene meshes with geometry and material 
+    var mesh = new THREE.Mesh(geometry, material);
+    var plane = new THREE.Mesh( geometry3, material3 );
+    
+    var mesh5 = new THREE.Mesh( geometry5, material5 ); 
+    var mesh6 = new THREE.Mesh( geometry6, material5 ); 
+    var mesh7 = new THREE.Mesh( geometry6, material5 );
+    var mesh8 = new THREE.Mesh( geometry6, material5 );
+     
+      //Iniitalize rock segment meshes  
+    var mesh2 = new THREE.Mesh( geometry2, material2 );  
+    var mesh4 = new THREE.Mesh( geometry4, material4 ); 
+      
+    var mesh9 = new THREE.Mesh( geometry2, material2 );  
+    var mesh10 = new THREE.Mesh( geometry2, material2 );  
+      
+    var mesh12 = new THREE.Mesh( geometry2, material2 ); 
+    var mesh13 = new THREE.Mesh( geometry2, material2 );  
+      
+    var mesh14 = new THREE.Mesh( geometry2, material2 ); 
+    var mesh15 = new THREE.Mesh( geometry2, material2 );  
+      
+    var mesh16 = new THREE.Mesh( geometry2, material2 );
+    var mesh17 = new THREE.Mesh( geometry2, material2 ); 
+      
+      
+      
+      // Lighting set up     
+    var light = new THREE.DirectionalLight("rgb(225,255,255)", 1.5);
+    scene.add(light)  
+      
+    var light2 = new THREE.DirectionalLight("rgb(225,255,255)", 2);  
+    light2.position.set(20,1,2)  
+     
+    const light3 = new THREE.AmbientLight( 0x404040, 2 ); // soft white light
+      
+     
+      // Now we can create our renderer. Thiis renders the scene.      
+	var renderer = new THREE.WebGLRenderer();
+
+      
+      // optional fog 2 - not sure i like it 
+    /* const color = 0x880000;
+     const density = 0.04;
+     scene.fog = new THREE.FogExp2(color, density);  
+  */    
+
+      // Camera Position 
+ 	camera.position.z = -5;
+      // Add Light to scene 
+    scene.add(light);
+    scene.add(light2);
+    scene.add(light3);
+      
+      
+     // Add world meshes to scene    
+    scene.add(mesh);	
+    scene.add(mesh5);
+    scene.add(mesh6);
+    scene.add(mesh7);
+    scene.add(mesh8);
+    scene.add(plane); 
+      
+     // Add spheres (rock) to scene 
+    scene.add(mesh2);
+    scene.add(mesh4);  
+    scene.add(mesh9);
+    scene.add(mesh10);
+    scene.add(mesh12);
+    scene.add(mesh13);
+    scene.add(mesh14);
+    scene.add(mesh15);
+    scene.add(mesh16);
+    scene.add(mesh17);
+      
+      
+       // Ensuring scene understands the resolution of the device
+	renderer.setPixelRatio(window.devicePixelRatio);
+       // Size of the render window
+	renderer.setSize(window.innerWidth, window.innerHeight);
+       // Connect the renderer to the HTML document
+	document.body.appendChild(renderer.domElement);
+       // Ensuring page is resized, everything gets updated 
+	window.addEventListener('resize', onWindowResize, false); 
+      
+    var controls = new THREE.OrbitControls (camera, renderer.domElement);
+       window.addEventListener('mousemove',getMouse,false)
+      
+      // initialize mouse for rock movement 
+    function getMouse (mousePosition) {
+    mouseX = mousePosition.layerX;
+    mouseY = mousePosition.layerY; }
+      
+    function distance(ax,ay,bx,by) {
+     var x1 = bx - ax;
+     var y1 = by - ay;
+     var c1 = Math.sqrt(x1 * x1 + y1 * y1);
+     return c1;
+}  
+
+    
+     function draw() {
+
+      //position and rotation of scene meshes in world    
+    plane.rotation.x =Math.PI/2;
+    mesh.position.x = -1.5;
+//	mesh.rotation.y+= 0.05; 
+   	mesh5.position.x = 0.0;
+	mesh5.rotation.y-= 0.0;
+    mesh6.position.x = -0.5;
+	mesh6.rotation.y-= 0.02;
+    mesh7.position.x = -2.5;
+	mesh7.rotation.y-= 0.01;
+    mesh8.position.x = -1.0;
+	mesh8.rotation.y+= 0.035;
+    plane.position.y = -9;
+
+       
+      //sphere (rock) mesh rotation
+	mesh2.rotation.y+= -0.01;
+    mesh4.rotation.y+= 0.02;
+      // rock 2
+  	mesh9.rotation.y+= -0.01;
+    mesh10.rotation.y+= 0.02;
+      //rock 3
+	mesh12.rotation.y+= -0.01;
+    mesh13.rotation.y+= 0.02;
+      //rock 4
+    mesh14.rotation.y+= -0.01;
+    mesh15.rotation.y+= 0.02;
+      // rock 5
+    mesh16.rotation.y+= -0.01;
+    mesh17.rotation.y+= 0.02;
+  
+  // Blurred rock movement from background to forground
+     mesh4.position.x += 0.01;
+     mesh4.position.z -= 3.0;
+    if (mesh4.position.z <= -2) {
+     mesh4.position.x += 0.01;
+  	 mesh4.position.z = 8;
+       }
+  
+     mesh10.position.x += 0.01;
+     mesh10.position.z -= 3.0;
+    if (mesh10.position.z <= -2) {
+     mesh10.position.x += 0.01;
+  	 mesh10.position.z = 8.00;
+       }
+  
+     mesh13.position.x += 0.01;
+     mesh13.position.z -= 3.0;
+    if (mesh13.position.z <= -2) {
+     mesh13.position.x += 0.01;
+  	 mesh13.position.z = 8;
+       }
+  
+     mesh15.position.x += 0.01;
+     mesh15.position.z -= 3.0;
+    if (mesh15.position.z <= -2) {
+     mesh15.position.x += 0.01;
+  	 mesh15.position.z = 8;
+      }
+ 
+     // Using  clock function to timie increase and decrease of world rotation to correspond to the speed of the audio
+     if( clock.playHead < 40) {
+       mesh.rotation.y+= 0.05; 
+     }
+      if( clock.playHead > 40 && clock.playHead < 70) {
+       mesh.rotation.y+= 0.10; 
+     }
+      
+          if( clock.playHead > 70 && clock.playHead < 100) {
+       mesh.rotation.y+= 0.2; 
+     }
+       
+              if( clock.playHead > 100 && clock.playHead < 140) {
+       mesh.rotation.y+= 0.009; 
+     }
+       
+                    if( clock.playHead > 140 && clock.playHead < 170) {
+       mesh.rotation.y+= 0.09; 
+     }
+     
+                      if( clock.playHead > 170 && clock.playHead < 230) {
+       mesh.rotation.y+= 0.15; 
+     }
+       
+       
+      if( clock.playHead > 230 ) {
+       mesh.rotation.y+= 0.02; 
+     }
+      
+   
+    var velocity = 2.0;
+       
+      // assigning current postion of rocks to corresponding 'x' and 'y' variables
+    
+    var currentX = mesh2.position.x;
+    var currentY = mesh2.position.y;
+    var currentX2 = mesh4.position.x;
+    var currentY2 = mesh4.position.y;
+    var currentX3 = mesh12.position.x;
+    var currentY3 = mesh12.position.y;
+    var currentX4 = mesh13.position.x;
+    var currentY4 = mesh13.position.y;
+    var currentX5 = mesh14.position.x;
+    var currentY5 = mesh14.position.y;
+    var currentX6 = mesh15.position.x;
+    var currentY6 = mesh15.position.y;
+       
+  
+    
+    
+    //  Logic applied to mouse movement and its affect on rock movement.
+    // e.g: If the currwnr mouse x coordiate is smaller than previous x coordinate you take the   currentX + (xMultiplier * (mouseX/200) * 0.01 * velocity) 
+   // equates to: currentX + ((-1)* (mouseX/200) * 0.01 * 2.0) = left to the left
+  
+    var xMultiplier = 1;
+    var yMultiplier = 1; 
+       
+       
+    if(mouseX < previousMouseX) {
+     xMultiplier = -1; 
+     }
+    if(mouseY > previousMouseY) {
+     yMultiplier = -1;
+     }
+      // If mouse x coordinate is the same as the previous, multiplier = 0, which means the rocks will not move when the mouse is still. 
+	if(mouseX == previousMouseX) {
+      xMultiplier = 0;
+    }
+  	if(mouseY == previousMouseY) {
+      yMultiplier = 0;
+    }
+  
+    var x = currentX + (xMultiplier * (mouseX/200) * 0.01 * velocity);
+    var y = currentY + (yMultiplier * (mouseY/200) * 0.01 * velocity);
+  
+    var x2 = currentX2 + (xMultiplier * (mouseX/200) * 0.01 * velocity);
+    var y2 = currentY2 + (yMultiplier * (mouseY/200) * 0.01 * velocity);
+  
+    var x3 = currentX3 + (xMultiplier * (mouseX/200) * 0.1 * velocity);
+    var y3 = currentY3 + (yMultiplier * (mouseY/200) * 0.1 * velocity);
+  
+    var x4 = currentX4 + (xMultiplier * (mouseX/200) * 0.1 * velocity);
+    var y4 = currentY4 + (yMultiplier * (mouseY/200) * 0.1 * velocity);
+  
+    var x5 = currentX3 + (xMultiplier * (mouseX/200) * 0.01 * velocity);
+    var y5 = currentY3 + (yMultiplier * (mouseY/200) * 0.01 * velocity);
+  
+    var x6 = currentX4 + (xMultiplier * (mouseX/200) * 0.01 * velocity);
+    var y6 = currentY4 + (yMultiplier * (mouseY/200) * 0.01 * velocity);
+  
+       
+       
+    previousMouseX = mouseX;
+    previousMouseY = mouseY; 
+       
+    
+       // Tells rock meshes how to move in x,y,z in relation to mouse
+    mesh2.position.set(x,y,mesh2.position.z);
+    mesh4.position.set(x,y,mesh4.position.z);
+    mesh9.position.set(-x,-y,mesh9.position.z);
+    mesh10.position.set(-x,-y,mesh10.position.z); 
+    mesh12.position.set((x+2),(y+2),mesh12.position.z);
+    mesh13.position.set((x+2),(y+2),mesh13.position.z); 
+    mesh14.position.set((-x-3),(-y-3),mesh14.position.z);
+    mesh15.position.set((-x-3),(-y-3),mesh15.position.z);  
+  
+    controls.update();
+	renderer.render(scene, camera);
+	requestAnimationFrame(draw);
+  
+  
+}
+
+     // Resizing screen 
+    function onWindowResize() {
+	camera.aspect = window.innerWidth / 		window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+}    
+      //Final call the draw loop.      
+requestAnimationFrame(draw());
+      
+	</script>
+</body>
+
+</html>
